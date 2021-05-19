@@ -1,3 +1,4 @@
-./vendor
-./mongodb/data
+/.idea/
+/vendor/
+./mongodb/data/
 ./.env
