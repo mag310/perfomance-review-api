@@ -1,0 +1,15 @@
+{
+    "name": "intersvyaz/perfomance-review",
+    "type": "project",
+    "minimum-stability": "dev",
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "dev-master",
+        "php-di/php-di": "dev-master",
+        "mongodb/mongodb": "v1.8.x-dev"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "4.0.x-dev",
+        "phpunit/phpunit": "9.5.x-dev"
+    }
+}
