@@ -2,6 +2,16 @@
     "name": "intersvyaz/perfomance-review",
     "type": "project",
     "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "app\\": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require": {
         "slim/slim": "4.*",
         "slim/psr7": "dev-master",

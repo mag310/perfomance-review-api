@@ -1,33 +1,18 @@
 <?php
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use app\middleware\BearerAuthMiddleware;
+use app\modules\main\DefaultController;
 use Slim\Factory\AppFactory;
 
 require __DIR__ . '/vendor/autoload.php';
+$container = include __DIR__ . '/config/container.php';
 
-$database = new MongoDB\Client('mongodb://mongo/', [
-    'username'   => 'root',
-    'password'   => 'example',
-    'ssl'        => false,
-    'authSource' => 'admin',
-]);
-$res = $database->perfomance->perfomance->insertOne(
-    [
-        'username' => 'admin',
-        'email'    => 'admin@example.com',
-        'name'     => 'Admin User',
-    ]);
-var_dump($res);
-//
-//$app = AppFactory::create();
-//
-//// Добавление промежуточного ПО обработки ошибок
-//$app->addErrorMiddleware(true, false, false);
-//
-//$app->get('/', function (Request $request, Response $response, $args) {
-//    $response->getBody()->write("Hello world!");
-//    return $response;
-//});
-//
-//$app->run();
+$app = AppFactory::createFromContainer($container);
+$app->addRoutingMiddleware();
+$app->addErrorMiddleware(true, true, true);
+$app->addBodyParsingMiddleware();
+
+$app->addMiddleware(new BearerAuthMiddleware($app));
+$app->get('/', [DefaultController::class, 'home']);
+
+$app->run();
