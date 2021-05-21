@@ -2,10 +2,15 @@
 
 namespace app\middleware;
 
+use app\interfaces\UserRepositoryInterface;
+use app\models\User;
+use DI\Container;
+use DI\DependencyException;
+use DI\NotFoundException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\App;
@@ -18,18 +23,17 @@ class BearerAuthMiddleware implements MiddlewareInterface
     /** @var App */
     private $app;
 
-    /** @var ResponseFactoryInterface */
-    private $responseFactory;
+    /** @var ContainerInterface; */
+    private $container;
 
     /**
      * BearerAuthMiddleware constructor.
      *
-     * @param App $app
+     * @param Container $container
      */
-    public function __construct($app)
+    public function __construct(Container $container)
     {
-        $this->app = $app;
-        $this->responseFactory = $app->getResponseFactory();
+        $this->container = $container;
     }
 
     /**
@@ -42,38 +46,29 @@ class BearerAuthMiddleware implements MiddlewareInterface
      * @param ServerRequestInterface  $request
      * @param RequestHandlerInterface $handler
      * @return ResponseInterface
+     * @throws DependencyException
+     * @throws NotFoundException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $token = $request->getHeader('Authorization');
+        [$token] = $request->getHeader('Authorization');
         if (empty($token)) {
+            return $handler->handle($request);
+        }
 
-            $body = $this->createStream('Unauthorized');
+        if (!preg_match('#^Bearer ([0-9a-f]+)$#', $token, $matches)) {
+            return $handler->handle($request);
+        }
 
-            return $this->responseFactory
-                ->createResponse(401)
-                ->withAddedHeader('WWW-Authenticate', 'Bearer')
-                ->withBody($body);
+        /** @var UserRepositoryInterface $repository */
+        $repository = $this->container->get('userRepository');
+        if ($user = $repository->findByToken($token)) {
+            $this->container->set('user', $user);
+        }else{
+            $this->container->set('user', new User());
         }
 
         /** @var ServerRequestInterface $request */
         return $handler->handle($request);
-    }
-
-    /**
-     * @return \Slim\Psr7\Factory\StreamFactory
-     */
-    protected function getStreamFactory()
-    {
-        return new \Slim\Psr7\Factory\StreamFactory();
-    }
-
-    /**
-     * @param string $contents
-     * @return StreamInterface
-     */
-    protected function createStream(string $contents = ''): StreamInterface
-    {
-        return $this->getStreamFactory()->createStream($contents);
     }
 }

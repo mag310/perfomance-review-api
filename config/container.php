@@ -1,6 +1,9 @@
 <?php
 
+use app\interfaces\UserRepositoryInterface;
+use app\repositories\UserRepository;
 use DI\Container;
+use function DI\create;
 use MongoDB\Client;
 use Psr\Container\ContainerInterface;
 
@@ -19,8 +22,12 @@ $container->set(Client::class, DI\create(Client::class)
     ));
 
 $container->set('db', function (ContainerInterface $container) {
-    $db = $container->get(Client::class);
-    return $db;
+    return $container->get(Client::class);
+});
+
+$container->set(UserRepositoryInterface::class, DI\create(UserRepository::class)->constructor($container));
+$container->set('userRepository', function (ContainerInterface $container) {
+    return $container->get(UserRepositoryInterface::class);
 });
 
 return $container;

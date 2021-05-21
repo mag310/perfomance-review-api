@@ -34,17 +34,22 @@ class DefaultController
      */
     public function home(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
-        $body = '';
-
-        $database = $this->container->get('db');
-        $collection = $database->perfomance->perfomance;
-        $cursor = $collection->find([]);
-
-        foreach ($cursor as $document) {
-            $body .= "<pre>";
-            $body .= var_export($document, true);
-            $body .= "</pre><br>\n";
+        if ($this->container->has('user')) {
+            $body = json_encode($this->container->get('user'));
+        } else {
+            $body = 'User not found!';
         }
+
+//
+//        $database = $this->container->get('db');
+//        $collection = $database->perfomance->perfomance;
+//        $cursor = $collection->find([]);
+//
+//        foreach ($cursor as $document) {
+//            $body .= "<pre>";
+//            $body .= var_export($document, true);
+//            $body .= "</pre><br>\n";
+//        }
 
         $response->getBody()->write($body);
 
