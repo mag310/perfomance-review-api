@@ -59,6 +59,7 @@ class BearerAuthMiddleware implements MiddlewareInterface
         if (!preg_match('#^Bearer ([0-9a-f]+)$#', $token, $matches)) {
             return $handler->handle($request);
         }
+        [,$token] = $matches;
 
         /** @var UserRepositoryInterface $repository */
         $repository = $this->container->get('userRepository');

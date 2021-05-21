@@ -11,4 +11,16 @@ interface UserRepositoryInterface extends ContainerInterface
      * @return UserInterface|null
      */
     public function findByToken(string $token): ?UserInterface;
+
+    /**
+     * @param string $phone
+     * @return UserInterface|null
+     */
+    public function findByPhone(string $phone): ?UserInterface;
+
+    /**
+     * @param UserInterface $user
+     * @return bool
+     */
+    public function save(UserInterface $user): bool;
 }

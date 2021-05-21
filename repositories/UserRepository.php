@@ -2,30 +2,45 @@
 
 namespace app\repositories;
 
+use app\interfaces\UserFactoryInterface;
 use app\interfaces\UserInterface;
 use app\interfaces\UserRepositoryInterface;
+use Awurth\SlimValidation\Validator;
 use DI\NotFoundException;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
+use MongoDB\Collection;
+use MongoDB\Model\BSONDocument;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Respect\Validation\Validator as V;
 
 class UserRepository implements UserRepositoryInterface
 {
-    /** @var ContainerInterface */
-    private $container;
     /** @var Client */
     private $db;
+    /** @var UserFactoryInterface */
+    private $factory;
+
+    /** @var Collection */
+    private $collection;
+
+    /** @var Validator */
+    private $validator;
 
     /**
      * UserRepository constructor.
      *
-     * @param ContainerInterface $container
+     * @param Client               $db
+     * @param UserFactoryInterface $factory
+     * @param Validator            $validator
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Client $db, UserFactoryInterface $factory, Validator $validator)
     {
-        $this->container = $container;
-        $this->db = $this->container->get('db');
+        $this->db = $db;
+        $this->collection = $this->db->perfomance->user;
+        $this->factory = $factory;
+        $this->validator = $validator;
     }
 
     /**
@@ -40,7 +55,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function get(string $id)
     {
-        $res = $this->db->perfomance->user->findOne(['id' => $id]);
+        $res = $this->collection->findOne(['id' => $id]);
         if ($res === null) {
             throw new NotFoundException('User not found!');
         }
@@ -61,7 +76,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function has(string $id)
     {
-        return $this->db->perfomance->user->findOne(['id' => $id]) !== null;
+        return $this->collection->findOne(['id' => $id]) !== null;
     }
 
     /**
@@ -70,6 +85,43 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findByToken(string $token): ?UserInterface
     {
-        return $this->db->perfomance->user->findOne(['token' => $token]);
+        /** @var BSONDocument $res */
+        $res = $this->collection->findOne(['authToken' => $token]);
+        if (!$res) {
+            return null;
+        }
+
+        return $this->factory->createFromArrayObject($res);
+    }
+
+    /**
+     * @param string $phone
+     * @return UserInterface|null
+     */
+    public function findByPhone(string $phone): ?UserInterface
+    {
+        /** @var BSONDocument $res */
+        $res = $this->collection->findOne(['phone' => $phone]);
+        if (!$res) {
+            return null;
+        }
+
+        return $this->factory->createFromArrayObject($res);
+    }
+
+    /**
+     * @param UserInterface $user
+     * @return bool
+     */
+    public function save(UserInterface $user): bool
+    {
+        if ($user->getId() !== null) {
+            $res = $this->collection->updateOne(['_id' => new ObjectId($user->getId())], $user);
+        } else {
+            $res = $this->collection->insertOne($user);
+            $user->setId($res->getInsertedId());
+        }
+
+        return true;
     }
 }

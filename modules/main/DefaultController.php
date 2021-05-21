@@ -26,7 +26,6 @@ class DefaultController
      * Начальная страница
      *
      * @api GET /
-     * @re
      * @param ServerRequestInterface $request
      * @param ResponseInterface      $response
      * @param array                  $args
@@ -40,17 +39,7 @@ class DefaultController
             $body = 'User not found!';
         }
 
-//
-//        $database = $this->container->get('db');
-//        $collection = $database->perfomance->perfomance;
-//        $cursor = $collection->find([]);
-//
-//        foreach ($cursor as $document) {
-//            $body .= "<pre>";
-//            $body .= var_export($document, true);
-//            $body .= "</pre><br>\n";
-//        }
-
+        $response = $response->withAddedHeader('Content-Type', 'application/json');
         $response->getBody()->write($body);
 
         return $response;

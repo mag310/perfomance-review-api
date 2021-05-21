@@ -5,6 +5,7 @@ use app\handlers\HttpUnauthorizedExceptionHandler;
 use app\handlers\NoValidateExceptionHandle;
 use app\middleware\BearerAuthMiddleware;
 use app\middleware\UnauthorizedMiddleware;
+use app\modules\auth\LoginController;
 use app\modules\main\DefaultController;
 use app\modules\comment\controllers\CommentController;
 use Slim\Exception\HttpUnauthorizedException;
@@ -20,8 +21,7 @@ $app->addRoutingMiddleware();
 
 $app->addBodyParsingMiddleware();
 
-$app//->addMiddleware(new UnauthorizedMiddleware($container))
-->addMiddleware(new BearerAuthMiddleware($container));
+$app->addMiddleware(new BearerAuthMiddleware($container));
 
 $app->addErrorMiddleware(true, true, true)
     ->setErrorHandler(
@@ -34,10 +34,13 @@ $app->addErrorMiddleware(true, true, true)
 
 $app->get('/', [DefaultController::class, 'home']);
 
+$app->group('/auth', function (RouteCollectorProxy $group) {
+    $group->post('/login', [LoginController::class, 'login']);
+});
+
 $app->group('/comment', function (RouteCollectorProxy $group) {
     $group->post('', [CommentController::class, 'add']);
     $group->put('/{id}', [CommentController::class, 'edit']);
 })->addMiddleware(new UnauthorizedMiddleware($container));
-
 
 $app->run();
