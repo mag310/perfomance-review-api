@@ -3,12 +3,11 @@
 namespace app\middleware;
 
 use app\interfaces\UserRepositoryInterface;
-use app\models\User;
+use app\entities\User;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

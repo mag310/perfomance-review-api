@@ -1,5 +1,6 @@
 <?php
 
+use app\handlers\HttpUnauthorizedExceptionHandler;
 use app\middleware\BearerAuthMiddleware;
 use app\middleware\UnauthorizedMiddleware;
 use app\modules\main\DefaultController;
@@ -13,15 +14,16 @@ $container = include __DIR__ . '/config/container.php';
 $app = AppFactory::createFromContainer($container);
 $app->addRoutingMiddleware();
 
-$httpUnauthorizedExceptionHandler = new HttpUnauthorizedException($app->getCallableResolver(), $app->getResponseFactory());
-
-$app->addErrorMiddleware(true, true, true)
-    ->setErrorHandler(HttpUnauthorizedException::class, $httpUnauthorizedExceptionHandler);
-
 $app->addBodyParsingMiddleware();
 
 $app->addMiddleware(new UnauthorizedMiddleware($container))
     ->addMiddleware(new BearerAuthMiddleware($container));
+
+$app->addErrorMiddleware(true, true, true)
+    ->setErrorHandler(
+        HttpUnauthorizedException::class,
+        new HttpUnauthorizedExceptionHandler($app->getCallableResolver(), $app->getResponseFactory())
+    );
 
 $app->get('/', [DefaultController::class, 'home']);
 
