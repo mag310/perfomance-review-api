@@ -51,6 +51,7 @@ class BearerAuthMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         [$token] = $request->getHeader('Authorization');
+
         if (empty($token)) {
             return $handler->handle($request);
         }

@@ -18,7 +18,8 @@
         "slim/slim": "4.*",
         "slim/psr7": "dev-master",
         "php-di/php-di": "dev-master",
-        "mongodb/mongodb": "v1.8.x-dev"
+        "mongodb/mongodb": "v1.8.x-dev",
+        "awurth/slim-validation": "dev-master"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "4.0.x-dev",
