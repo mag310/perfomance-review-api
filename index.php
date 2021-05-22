@@ -2,6 +2,7 @@
 
 use app\exceptions\NoValidationException;
 use app\handlers\HttpUnauthorizedExceptionHandler;
+use app\handlers\NotFoundExceptionHandler;
 use app\handlers\NoValidateExceptionHandle;
 use app\middleware\BearerAuthMiddleware;
 use app\middleware\OptionsMiddleware;
@@ -9,6 +10,8 @@ use app\middleware\UnauthorizedMiddleware;
 use app\modules\auth\AuthController;
 use app\modules\user\DefaultController;
 use app\modules\comment\controllers\CommentController;
+use app\modules\pr\controller\PrController;
+use DI\NotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -32,6 +35,9 @@ $app->addErrorMiddleware(true, true, true)
     )->setErrorHandler(
         NoValidationException::class,
         new NoValidateExceptionHandle($app->getCallableResolver(), $app->getResponseFactory())
+    )->setErrorHandler(
+        NotFoundException::class,
+        new NotFoundExceptionHandler($app->getCallableResolver(), $app->getResponseFactory())
     );
 
 $app->group('/auth', function (RouteCollectorProxy $group) {
@@ -46,8 +52,12 @@ $app->group('/user', function (RouteCollectorProxy $group) {
 })->addMiddleware(new UnauthorizedMiddleware($container));;
 
 $app->group('/comment', function (RouteCollectorProxy $group) {
-    $group->post('', [CommentController::class, 'add']);
-    $group->put('/{id}', [CommentController::class, 'edit']);
+    $group->post('', [CommentController::class, 'save']);
+    $group->put('/{id}', [CommentController::class, 'save']);
 })->addMiddleware(new UnauthorizedMiddleware($container));
 
+$app->group('/pr', function (RouteCollectorProxy $group) {
+    $group->post('', [PrController::class, 'save']);
+    $group->put('/{id}', [PrController::class, 'save']);
+})->addMiddleware(new UnauthorizedMiddleware($container));
 $app->run();
