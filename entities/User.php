@@ -11,13 +11,13 @@ class User implements UserInterface
 {
     /** @var mixed */
     private $id;
+    /** @var string */
+    private $authToken;
 
     /** @var string */
     public $phone;
     /** @var string */
     public $fio;
-    /** @var string */
-    public $authToken;
 
     /** @return mixed */
     public function getId()
@@ -31,9 +31,15 @@ class User implements UserInterface
         return $this->authToken;
     }
 
-    /** @param mixed */
-    public function setId($id)
+    /** @inheritDoc */
+    public function setId($id): void
     {
         $this->id = $id;
+    }
+
+    /** @inheritDoc */
+    public function setAuthToken(?string $authToken): void
+    {
+        $this->authToken = $authToken;
     }
 }

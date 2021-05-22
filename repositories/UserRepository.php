@@ -7,13 +7,11 @@ use app\interfaces\UserInterface;
 use app\interfaces\UserRepositoryInterface;
 use Awurth\SlimValidation\Validator;
 use DI\NotFoundException;
-use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Model\BSONDocument;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Respect\Validation\Validator as V;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -115,12 +113,13 @@ class UserRepository implements UserRepositoryInterface
      */
     public function save(UserInterface $user): bool
     {
-        if ($user->getId() !== null) {
-            $res = $this->collection->updateOne(['_id' => new ObjectId($user->getId())], $user);
-        } else {
-            $res = $this->collection->insertOne($user);
-            $user->setId($res->getInsertedId());
-        }
+        $data = $this->factory->createArrayObject($user);
+
+        $updateResult = $this->collection->updateOne(
+            ['id' => $user->getId()],
+            ['$set' => $data],
+            ['upsert' => true]
+        );
 
         return true;
     }

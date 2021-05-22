@@ -4,6 +4,7 @@ namespace app\modules\auth;
 
 use app\exceptions\NoValidationException;
 use app\interfaces\UserFactoryInterface;
+use app\interfaces\UserInterface;
 use app\interfaces\UserRepositoryInterface;
 use Awurth\SlimValidation\Validator;
 use Exception;
@@ -12,7 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Respect\Validation\Validator as V;
 
-class LoginController
+class AuthController
 {
     /** @var ContainerInterface */
     private $container;
@@ -53,8 +54,28 @@ class LoginController
             $this->repository->save($user);
         }
 
+        if ($user->getAuthToken() === null) {
+            $user->setAuthToken(bin2hex(random_bytes(16)));
+            $this->repository->save($user);
+        }
+
         $response = $response->withAddedHeader('Content-Type', 'application/json');
-        $response->getBody()->write(json_encode($user));
+        $data = ['token' => $user->getAuthToken()];
+        $response->getBody()->write(json_encode($data));
+
+        return $response;
+    }
+
+    public function logout(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    {
+        if ($this->container->has('user')) {
+            /** @var UserInterface $user */
+            $user = $this->container->get('user');
+            $user->setAuthToken(null);
+            $this->repository->save($user);
+        }
+
+        $response = $response->withStatus(204);
         return $response;
     }
 }

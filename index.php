@@ -5,8 +5,8 @@ use app\handlers\HttpUnauthorizedExceptionHandler;
 use app\handlers\NoValidateExceptionHandle;
 use app\middleware\BearerAuthMiddleware;
 use app\middleware\UnauthorizedMiddleware;
-use app\modules\auth\LoginController;
-use app\modules\main\DefaultController;
+use app\modules\auth\AuthController;
+use app\modules\user\DefaultController;
 use app\modules\comment\controllers\CommentController;
 use Slim\Exception\HttpUnauthorizedException;
 use Slim\Factory\AppFactory;
@@ -32,11 +32,16 @@ $app->addErrorMiddleware(true, true, true)
         new NoValidateExceptionHandle($app->getCallableResolver(), $app->getResponseFactory())
     );
 
-$app->get('/', [DefaultController::class, 'home']);
-
 $app->group('/auth', function (RouteCollectorProxy $group) {
-    $group->post('/login', [LoginController::class, 'login']);
+    $group->post('/login', [AuthController::class, 'login']);
+    $group->get('/logout', [AuthController::class, 'logout']);
 });
+
+$app->group('/user', function (RouteCollectorProxy $group) {
+    $group->get('', [DefaultController::class, 'info']);
+    $group->get('/info/{id}', [DefaultController::class, 'info']);
+    $group->put('', [DefaultController::class, 'update']);
+})->addMiddleware(new UnauthorizedMiddleware($container));;
 
 $app->group('/comment', function (RouteCollectorProxy $group) {
     $group->post('', [CommentController::class, 'add']);
