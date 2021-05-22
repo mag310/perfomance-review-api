@@ -43,6 +43,7 @@ class UserFactory implements UserFactoryInterface
         $user = new User();
         $user->phone = $array['phone'];
         $user->fio = $array['fio'] ?? '';
+        $user->chatId = $array['chatId'] ?? 0;
 
         $user->setId($array['id'] ?? $this->createGuid());
         $user->setAuthToken($this->createAuthToken());
@@ -63,6 +64,7 @@ class UserFactory implements UserFactoryInterface
         $array['phone'] = $user->phone;
         $array['fio'] = $user->fio;
         $array['authToken'] = $user->getAuthToken();
+        $array['chatId'] = $user->chatId;
 
         return $array;
     }

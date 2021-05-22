@@ -18,6 +18,8 @@ class User implements UserInterface
     public $phone;
     /** @var string */
     public $fio;
+    /** @var int */
+    public $chatId;
 
     /** @return mixed */
     public function getId()

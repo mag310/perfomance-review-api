@@ -41,6 +41,22 @@ class AuthController
     {
         $data = $request->getParsedBody();
 
+        if(!isset($data['fio'])){
+            $data['fio'] = '';
+        }
+
+        if(isset($data['phoneNumber'])){
+            $data['phone'] = $data['phoneNumber'];
+        }
+
+        if(isset($data['firstName'])){
+            $data['fio'] .= ' ' . $data['firstName'];
+        }
+
+        if(isset($data['lastName'])){
+            $data['fio'] .= ' ' . $data['lastName'];
+        }
+
         /** @var Validator $validator */
         $validator = $this->container->get('validator')->array($data, [
             'phone' => V::notBlank(),

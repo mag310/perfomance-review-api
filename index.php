@@ -4,6 +4,7 @@ use app\exceptions\NoValidationException;
 use app\handlers\HttpUnauthorizedExceptionHandler;
 use app\handlers\NoValidateExceptionHandle;
 use app\middleware\BearerAuthMiddleware;
+use app\middleware\OptionsMiddleware;
 use app\middleware\UnauthorizedMiddleware;
 use app\modules\auth\AuthController;
 use app\modules\user\DefaultController;
@@ -22,6 +23,7 @@ $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
 $app->addMiddleware(new BearerAuthMiddleware($container));
+$app->addMiddleware(new OptionsMiddleware($container));
 
 $app->addErrorMiddleware(true, true, true)
     ->setErrorHandler(
