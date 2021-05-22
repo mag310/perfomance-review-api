@@ -31,7 +31,7 @@ class MessageController
     {
 
         /** @var UserFactoryInterface $fabric */
-        $body = json_encode([['chatId' => '121312311', 'message' => 'Тестовое сообщение']]);
+        $body = json_encode([['chatId' => '237653908', 'message' => 'Вам необходимо пройти тест-ревью за 1229Q3']]);
 
         $response = $response->withAddedHeader('Content-Type', 'application/json');
         $response->getBody()->write($body);

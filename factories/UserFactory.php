@@ -53,18 +53,38 @@ class UserFactory implements UserFactoryInterface
 
     /**
      * @param UserInterface $user
+     * @param array|null    $fields
      * @return ArrayObject
      */
-    public function createArrayObject(UserInterface $user): ArrayObject
+    public function createArrayObject(UserInterface $user, ?array $fields = null): ArrayObject
     {
         /** @var User $user */
         $array = new BSONDocument();
+        if ($fields === null) {
+            $array['id'] = $user->getId();
+            $array['phone'] = $user->phone;
+            $array['fio'] = $user->fio;
+            $array['authToken'] = $user->getAuthToken();
+            $array['chatId'] = $user->chatId;
+            return $array;
+        }
 
-        $array['id'] = $user->getId();
-        $array['phone'] = $user->phone;
-        $array['fio'] = $user->fio;
-        $array['authToken'] = $user->getAuthToken();
-        $array['chatId'] = $user->chatId;
+        foreach ($fields as $fieldName) {
+            switch ($fieldName) {
+                case 'id':
+                    $array['id'] = $user->getId();
+                    break;
+                case'authToken':
+                    $array['id'] = $user->getAuthToken();
+                    break;
+                default:
+                    if (property_exists(User::class, $fieldName)) {
+                        $array[$fieldName] = $user->$fieldName;
+                    } else {
+                        $array[$fieldName] = null;
+                    }
+            }
+        }
 
         return $array;
     }

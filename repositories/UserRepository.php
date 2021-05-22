@@ -108,6 +108,23 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * @param array $filter
+     * @param array $options
+     * @return UserInterface[]
+     */
+    public function findAll($filter = [], array $options = [])
+    {
+        $cursor = $this->collection->find($filter, $options);
+
+        $res = [];
+        foreach ($cursor as $row) {
+            $res[] = $this->factory->createFromArrayObject($row);
+        }
+
+        return $res;
+    }
+
+    /**
      * @param UserInterface $user
      * @return bool
      */

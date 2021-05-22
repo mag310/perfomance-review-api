@@ -8,28 +8,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Exception\HttpUnauthorizedException;
-use Slim\Psr7\Response;
 
 /**
  * 401 Если не авторизован
  */
-class OptionsMiddleware implements MiddlewareInterface
+class CORSMiddleware implements MiddlewareInterface
 {
-    private const METHOD_OPTIONS = 'OPTIONS';
-
-    /** @var Container; */
-    private $container;
-
-    /**
-     * BearerAuthMiddleware constructor.
-     *
-     * @param Container $container
-     */
-    public function __construct($container)
-    {
-        $this->container = $container;
-    }
-
     /**
      * Process an incoming server request.
      *
@@ -44,15 +28,12 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $response =  $handler->handle($request);
+        $response = $handler->handle($request);
 
-        $methods = ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'];
         $response = $response
-            ->withHeader('Vary', 'Origin')
             ->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Access-Control-Allow-Headers', '*')//implode(',', ['Authorization']))
-            ->withHeader('Access-Control-Allow-Credentials', 'true')
-            ->withHeader('Access-Control-Allow-Methods', implode(',', $methods));
+            ->withHeader('Access-Control-Allow-Headers', 'Authorization, Accept, Content-Type, Keep-Alive, Origin, User-Agent, X-Requested-With')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 
         return $response;
     }

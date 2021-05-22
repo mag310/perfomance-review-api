@@ -5,14 +5,16 @@ use app\handlers\HttpUnauthorizedExceptionHandler;
 use app\handlers\NotFoundExceptionHandler;
 use app\handlers\NoValidateExceptionHandle;
 use app\middleware\BearerAuthMiddleware;
-use app\middleware\OptionsMiddleware;
+use app\middleware\CORSMiddleware;
 use app\middleware\UnauthorizedMiddleware;
 use app\modules\auth\AuthController;
 use app\modules\chat\MessageController;
 use app\modules\user\DefaultController;
 use app\modules\comment\controllers\CommentController;
 use app\modules\pr\controller\PrController;
+use app\modules\user\ListController;
 use DI\NotFoundException;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpUnauthorizedException;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -27,7 +29,7 @@ $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
 $app->addMiddleware(new BearerAuthMiddleware($container));
-$app->addMiddleware(new OptionsMiddleware($container));
+$app->addMiddleware(new CORSMiddleware());
 
 $app->addErrorMiddleware(true, true, true)
     ->setErrorHandler(
@@ -49,9 +51,9 @@ $app->group('/auth', function (RouteCollectorProxy $group) {
 $app->group('/user', function (RouteCollectorProxy $group) {
     $group->get('', [DefaultController::class, 'info']);
     $group->get('/info/{id}', [DefaultController::class, 'info']);
-    $group->get('/list', [\app\modules\user\ListController::class, 'list']);
+    $group->get('/list', [ListController::class, 'list']);
     $group->put('', [DefaultController::class, 'update']);
-})->addMiddleware(new UnauthorizedMiddleware($container));;
+})->addMiddleware(new UnauthorizedMiddleware($container));
 
 $app->group('/comment', function (RouteCollectorProxy $group) {
     $group->post('', [CommentController::class, 'save']);
@@ -67,4 +69,7 @@ $app->group('/chat', function (RouteCollectorProxy $group) {
     $group->get('/message', [MessageController::class, 'unSending']);
 });
 
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+    throw new HttpNotFoundException($request);
+});
 $app->run();

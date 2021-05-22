@@ -2,7 +2,6 @@
 
 namespace app\modules\user;
 
-use app\entities\User;
 use app\interfaces\UserFactoryInterface;
 use app\interfaces\UserRepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -29,17 +28,34 @@ class ListController
         $this->factory = $this->container->get('userFactory');
     }
 
-    public function list(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface      $response
+     * @param array                  $args
+     * @return ResponseInterface
+     * @throws HttpUnauthorizedException
+     */
+    public function list(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         if (!$this->container->has('user')) {
             throw new HttpUnauthorizedException($request, 'User not found!');
         }
 
-        /** @var User $user */
-        $user = $this->container->get('user');
+        $params = $request->getQueryParams();
 
+        $filter = [];
+
+        $users = $this->repository->findAll($filter, [
+            'limit' => (int)($params['limit'] ?? 5),
+            'skip'  => (int)($params['offset'] ?? 0),
+        ]);
+
+        $rows = [];
+        foreach ($users as $user) {
+            $rows[] = $this->factory->createArrayObject($user, ['id', 'fio']);
+        }
         /** @var UserFactoryInterface $fabric */
-        $body = json_encode($this->factory->createArrayObject($user));
+        $body = json_encode($rows);
 
         $response = $response->withAddedHeader('Content-Type', 'application/json');
         $response->getBody()->write($body);

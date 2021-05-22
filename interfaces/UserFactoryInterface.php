@@ -14,9 +14,10 @@ interface UserFactoryInterface
 
     /**
      * @param UserInterface $user
+     * @param array|null    $fields
      * @return ArrayObject
      */
-    public function createArrayObject(UserInterface $user): ArrayObject;
+    public function createArrayObject(UserInterface $user, ?array $fields = null): ArrayObject;
 
     /**
      * @param array $array
