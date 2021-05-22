@@ -13,7 +13,7 @@
 ||||
 |POST      | [/pr](#pr-post)| Создание нового PerformanceRequest |
 |PUT       | [/pr/{id}](#prid-put)| обновление, редактирование PR |
-|GET       | ![/pr](#pr-get)| получить объект PR для текущего пользователя |
+|GET       | *[/pr](#pr-get)| получить объект PR для текущего пользователя |
 ||||
 |POST      |[/comment](#comment-post)|создание отзыва на PR|
 |PUT       |[/comment/{id}](#commentid-put)|редактирвоание отзыва|
@@ -25,6 +25,8 @@
 ||||
 |GET       |  [/chat/message](#chatmessage-get) | получить сообщения для отправки пользователю|
 ||||
+
+**- метод не реализован*
 
 ## /auth/login POST
    ### Request: 
