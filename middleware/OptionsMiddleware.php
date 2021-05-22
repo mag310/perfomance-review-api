@@ -44,18 +44,16 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($request->getMethod() !== self::METHOD_OPTIONS) {
-            return $handler->handle($request);
-        }
-
-        $response = new Response();
+        $response =  $handler->handle($request);
 
         $methods = ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'];
-        return $response
+        $response = $response
             ->withHeader('Vary', 'Origin')
             ->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Headers', '*')//implode(',', ['Authorization']))
             ->withHeader('Access-Control-Allow-Credentials', 'true')
             ->withHeader('Access-Control-Allow-Methods', implode(',', $methods));
+
+        return $response;
     }
 }

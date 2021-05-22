@@ -28,7 +28,6 @@ class DefaultController
     {
         $this->container = $container;
         $this->factory = $this->container->get('userFactory');
-
     }
 
     /**
@@ -90,8 +89,7 @@ class DefaultController
 
         $response = $response
             ->withStatus(202)
-            ->withAddedHeader('Content-Type', 'application/json')
-            ->withAddedHeader('Location', '/user/info/' . $user->getId());
+            ->withAddedHeader('Content-Type', 'application/json');
 
         $response->getBody()->write($body);
 

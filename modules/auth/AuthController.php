@@ -41,19 +41,19 @@ class AuthController
     {
         $data = $request->getParsedBody();
 
-        if(!isset($data['fio'])){
+        if (!isset($data['fio'])) {
             $data['fio'] = '';
         }
 
-        if(isset($data['phoneNumber'])){
+        if (isset($data['phoneNumber'])) {
             $data['phone'] = $data['phoneNumber'];
         }
 
-        if(isset($data['firstName'])){
+        if (isset($data['firstName'])) {
             $data['fio'] .= ' ' . $data['firstName'];
         }
 
-        if(isset($data['lastName'])){
+        if (isset($data['lastName'])) {
             $data['fio'] .= ' ' . $data['lastName'];
         }
 
@@ -62,7 +62,12 @@ class AuthController
             'phone' => V::notBlank(),
         ]);
         if (!$validator->isValid()) {
-            throw new NoValidationException($validator->getErrors());
+            $response
+                ->withStatus(422)
+                ->getBody()
+                ->write(json_encode($validator->getErrors()));
+
+            return $response;
         }
 
         if (!$user = $this->repository->findByPhone($data['phone'])) {

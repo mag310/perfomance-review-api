@@ -8,6 +8,7 @@ use app\middleware\BearerAuthMiddleware;
 use app\middleware\OptionsMiddleware;
 use app\middleware\UnauthorizedMiddleware;
 use app\modules\auth\AuthController;
+use app\modules\chat\MessageController;
 use app\modules\user\DefaultController;
 use app\modules\comment\controllers\CommentController;
 use app\modules\pr\controller\PrController;
@@ -48,6 +49,7 @@ $app->group('/auth', function (RouteCollectorProxy $group) {
 $app->group('/user', function (RouteCollectorProxy $group) {
     $group->get('', [DefaultController::class, 'info']);
     $group->get('/info/{id}', [DefaultController::class, 'info']);
+    $group->get('/list', [\app\modules\user\ListController::class, 'list']);
     $group->put('', [DefaultController::class, 'update']);
 })->addMiddleware(new UnauthorizedMiddleware($container));;
 
@@ -60,4 +62,9 @@ $app->group('/pr', function (RouteCollectorProxy $group) {
     $group->post('', [PrController::class, 'save']);
     $group->put('/{id}', [PrController::class, 'save']);
 })->addMiddleware(new UnauthorizedMiddleware($container));
+
+$app->group('/chat', function (RouteCollectorProxy $group) {
+    $group->get('/message', [MessageController::class, 'unSending']);
+});
+
 $app->run();
