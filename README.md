@@ -4,7 +4,7 @@
 | methods  | path        | описание |
 | -------- |:------------|---------:|
 | POST     | [/auth/login](#authlogin-post) | регистрация и авторизация пользоватля |
-| GET     | [/auth/logout](#authlogout-post) | logout |
+| GET      | [/auth/logout](#authlogout-post) | logout |
 ||||
 | GET      | [/user](#user-get)      | получение данных о пользователе по токену|   
 | PUT      | [/user](#user-put)       | обновление данных пользователя |   
@@ -15,13 +15,13 @@
 |PUT       | [/pr/{id}](#prid-put)| обновление, редактирование PR |
 |GET       | ![/pr](#pr-get)| получить объект PR для текущего пользователя |
 ||||
-|POST|[/comment](#comment-post)|создание отзыва на PR|
-|PUT|[/comment/{id}](#commentid-put)|редактирвоание отзыва|
-|GET|![/comment/{prID}](#commentprid-get)|просмотр всех отзывов по PR|
+|POST      |[/comment](#comment-post)|создание отзыва на PR|
+|PUT       |[/comment/{id}](#commentid-put)|редактирвоание отзыва|
+|GET       |*[/comment/{prID}](#commentprid-get)|просмотр всех отзывов по PR|
 ||||
-|POST      | ![/selfReveiw](#selfreveiw-post)| Создание нового SR |
-|PUT       | ![/selfReveiw/{id}](#selfreveiwid-put)| обновление, редактирование SR |
-|GET       | ![/selfReview/{id}](#selfreveiwid-get) | получить SR|
+|POST      | *[/selfReveiw](#selfreveiw-post)| Создание нового SR |
+|PUT       | *[/selfReveiw/{id}](#selfreveiwid-put)| обновление, редактирование SR |
+|GET       | *[/selfReview/{id}](#selfreveiwid-get) | получить SR|
 ||||
 |GET       |  [/chat/message](#chatmessage-get) | получить сообщения для отправки пользователю|
 ||||
