@@ -4,24 +4,27 @@
 | methods  | path        | описание |
 | -------- |:------------|---------:|
 | POST     | [/auth/login](#authlogin-post) | регистрация и авторизация пользоватля |
+| GET     | [/auth/logout](#authlogout-post) | logout |
 ||||
-| GET      | [/user](#user--get)      | получение данных о пользователе по токену|   
-| PUT      | [/user](#user--put)       | обновление данных пользователя |   
-| GET      | [/users](#users--get)       | получение данных обо всех пользователях системы |   
+| GET      | [/user](#user-get)      | получение данных о пользователе по токену|   
+| PUT      | [/user](#user-put)       | обновление данных пользователя |   
+| GET      | [/user/list](#userlist-get)       | получение данных обо всех пользователях системы |   
+| GET      | [/user/info/{id}](#userinfoid-get)       | получение данных по пользователю системы |   
 ||||
-|POST      | [/perfRequest](#perfrequest-post)| Создание нового PerformanceRequest |
-|PUT       | [/perfRequest/{id}](#perfrequestid-put)| обновление, редактирование PR |
-|GET      | [/perfRequest](#perfrequest-get) | получить все PR по токену|
+|POST      | [/pr](#pr-post)| Создание нового PerformanceRequest |
+|PUT       | [/pr/{id}](#prid-put)| обновление, редактирование PR |
+|GET       | ![/pr](#pr-get)| получить объект PR для текущего пользователя |
 ||||
 |POST|[/comment](#comment-post)|создание отзыва на PR|
 |PUT|[/comment/{id}](#commentid-put)|редактирвоание отзыва|
-|GET|[/comment/{prID}](#commentprid-get)|просмотр всех отзывов по PR|
+|GET|![/comment/{prID}](#commentprid-get)|просмотр всех отзывов по PR|
 ||||
-|POST      | [/selfReveiw](#selfreveiw-post)| Создание нового SR |
-|PUT       | [/selfReveiw/{id}](#selfreveiwid-put)| обновление, редактирование SR |
-|GET      |  [/selfReview/{id}](#selfreveiwid-get) | получить SR|
+|POST      | ![/selfReveiw](#selfreveiw-post)| Создание нового SR |
+|PUT       | ![/selfReveiw/{id}](#selfreveiwid-put)| обновление, редактирование SR |
+|GET       | ![/selfReview/{id}](#selfreveiwid-get) | получить SR|
 ||||
-
+|GET       |  [/chat/message](#chatmessage-get) | получить сообщения для отправки пользователю|
+||||
 
 ## /auth/login POST
    ### Request: 
@@ -52,7 +55,11 @@
        "token": "cadfc12cd20c6ac48e86055b6c7ad48e"
    }
    ```
-## /user  GET
+## /auth/logout GET
+    response:
+    204 No Content
+
+## /user GET
    ### Request: 
    Заголовки:
    - Authorization: Bearer
@@ -60,7 +67,8 @@
    - `id` - id пользователя
    - `phone` - телефон пользователя
    - `fio` - ФИО
-   - `name` - короткое имя
+   - `authToken` токен пользователя
+   - `chatId` id чата телеграм
    ### Example:
    ```bash
    # request
@@ -70,12 +78,14 @@
      - http://192.168.0.111:8234/
    # response
    {
-     "phone": "79511234578",
-  "fio": "Matyukhin Danil",
-     "name": "TruePi4"
+     "id": "b3c90f5a-40b4-46f0-9efc-5c0e9f6e019d",
+     "phone": "79517898136",
+     "fio": "Matyukhin Danil",
+     "authToken": "cadfc12cd20c6ac48e86055b6c7ad48e",
+     "chatId": null
    }
    ```
-## /user  PUT
+## /user PUT
    ### Request: 
    Заголовки:
    - Authorization: Bearer
@@ -84,20 +94,22 @@
    - `id` - id пользователя
    Необязательные параметры:
    *(изменяемые добавляемые)*
-   - `phone`
-   - `fio`
-   - `name`
+   - `phone` - телефон пользователя
+   - `fio` - ФИО
+   - `authToken` токен пользователя
+   - `chatId` id чата телеграм
    ### Response:
    - `id` - id пользователя
-   - `phone`
-   - `fio`
-   - `name`
+   - `phone` - телефон пользователя
+   - `fio` - ФИО
+   - `authToken` токен пользователя
+   - `chatId` id чата телеграм
    ### Example:
    ```bash
    # request
    # response
    ```
-## /users  GET
+## /user/list GET
    ### Request: 
    Заголовки:
    - Authorization: Bearer
@@ -105,16 +117,34 @@
    ### Response:
    *массив пользователей*
    - `id` - id пользователя
-   - `phone`
-   - `fio`
-   - `name`
+   - `phone` - телефон пользователя
+   - `fio` - ФИО
+   - `authToken` токен пользователя
+   - `chatId` id чата телеграм
    ### Example:
    ```bash
    # request
    # response
    ```
 
-## /perfRequest POST
+## /user/info/{id} GET
+   ### Request: 
+   Заголовки:
+   - Authorization: Bearer
+
+   ### Response:
+   - `id` - id пользователя
+   - `phone` - телефон пользователя
+   - `fio` - ФИО
+   - `authToken` токен пользователя
+   - `chatId` id чата телеграм
+   ### Example:
+   ```bash
+   # request
+   # response
+   ```
+
+## /pr POST
    ### Request: 
    Заголовки: 
    - Authorization: Bearer
@@ -133,26 +163,7 @@
    # response
    ```
 
-## /perfRequest GET
-   ### Request: 
-   Заголовки: 
-   - Authorization: Bearer
-
-   Обязательные параметры:
-   - .
-   Необязательные параметры:
-   - .
-   
-   ### Response:
-   - данные по всем PR для пользоателя определяемого токеном
-
-   ### Example:
-   ```bash
-   # request
-   # response
-   ```
-
-## /perfRequest/{id} PUT
+## /pr/{id} PUT
    ### Request: 
    Заголовки: 
    - Authorization: Bearer
@@ -287,3 +298,25 @@
    # request
    # response
    ```
+## /chat/message GET
+   ### Request: 
+   Заголовки: 
+   - .
+   - 
+   Обязательные параметры:
+   - .
+   
+   Необязательные параметры:
+   - .
+   
+   ### Response:
+   - *массив с сообщениями для пользователей*
+   - `chatId`  id телеграм чата
+   - `message` сообщение, которое нужно отправить пользователю
+
+   ### Example:
+   ```bash
+   # request
+   # response
+   ```
+   
